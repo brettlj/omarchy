@@ -1,6 +1,10 @@
+// name is the BlueZ alias, deviceName the device's own; an alias that is no name
+// must not hide a device that has one.
 function deviceLabel(device) {
   if (!device) return ""
-  return String(device.name || device.deviceName || "").trim()
+  var alias = String(device.name || "").trim()
+  if (isHumanLabel(alias)) return alias
+  return String(device.deviceName || alias).trim()
 }
 
 function toArray(values) {
@@ -33,9 +37,13 @@ function normalizedAddress(value) {
   return String(value || "").trim().toLowerCase().replace(/[^0-9a-f]/g, "")
 }
 
+function isHumanLabel(value) {
+  var text = String(value || "").trim()
+  return text !== "" && !isUuidLike(text) && !isAddressLike(text)
+}
+
 function hasHumanName(device) {
-  var label = deviceLabel(device)
-  return label !== "" && !isUuidLike(label) && !isAddressLike(label)
+  return isHumanLabel(deviceLabel(device))
 }
 
 function nodeProps(node) {
@@ -161,6 +169,7 @@ if (typeof module !== "undefined") {
     isUuidLike: isUuidLike,
     isAddressLike: isAddressLike,
     normalizedAddress: normalizedAddress,
+    isHumanLabel: isHumanLabel,
     hasHumanName: hasHumanName,
     nodeProps: nodeProps,
     nodeText: nodeText,

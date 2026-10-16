@@ -107,6 +107,15 @@ assertEqual(
   'MX Master 3S',
   'bluetooth falls back to deviceName when no alias-aware name is set'
 )
+const unnamedAliasLists = bluetooth.deviceLists([
+  { name: 'AA:BB:CC:DD:EE:01', deviceName: 'JBL Go 3', address: 'AA:BB:CC:DD:EE:01', connected: true },
+  { name: '   ', deviceName: 'MX Master 3S', address: 'AA:BB:CC:DD:EE:02', paired: true }
+])
+assertDeepEqual(
+  unnamedAliasLists.connected.concat(unnamedAliasLists.known).map(bluetooth.deviceLabel),
+  ['JBL Go 3', 'MX Master 3S'],
+  'bluetooth keeps showing a named device whose alias is not a name'
+)
 
 assertDeepEqual(
   bluetooth.withPendingAction({ a: 'connecting' }, 'b', 'forgetting'),
