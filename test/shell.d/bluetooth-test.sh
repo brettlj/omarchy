@@ -154,6 +154,23 @@ assert(
   !bluetooth.bluetoothSinkMatchesDevice({ isSink: false, isStream: false, ready: true, name: 'bluez_output.AA_BB_CC_DD_EE_FF.1', properties: {} }, { address: 'AA:BB:CC:DD:EE:FF', name: 'JBL Go 3' }),
   'bluetooth ignores non-sink nodes when matching audio outputs'
 )
+const builtInSink = {
+  isSink: true,
+  isStream: false,
+  ready: true,
+  name: 'alsa_output.pci-0000_00_1f.3.analog-stereo',
+  properties: { 'node.description': 'Speaker + Headphones' }
+}
+assertEqual(
+  bluetooth.bluetoothSinkFor([builtInSink, bluetoothSink], { address: 'AA:BB:CC:DD:EE:FF', name: 'Headphones', deviceName: 'JBL Go 3' }),
+  bluetoothSink,
+  'bluetooth picks the sink carrying the device address over an earlier sink sharing its alias'
+)
+assertEqual(
+  bluetooth.bluetoothSinkFor([builtInSink], { address: '11:22:33:44:55:66', name: 'Headphones' }),
+  builtInSink,
+  'bluetooth falls back to the label when no sink carries the device address'
+)
 JS
 
 # Turning Bluetooth off is an rfkill soft block, not a bluetoothctl power off,
